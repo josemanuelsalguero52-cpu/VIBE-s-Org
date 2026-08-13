@@ -1,5 +1,40 @@
 @import "tailwindcss";
 
+@layer base {
+  html, body {
+    background-color: #0A0E14;
+    color: #F1F5F9;
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    /* Dark scrollbar support for Firefox */
+    scrollbar-color: rgba(255, 255, 255, 0.15) #0A0E14;
+    scrollbar-width: thin;
+  }
+
+  /* Remove/customize standard webkit browser scrollbars for html and body */
+  html::-webkit-scrollbar,
+  body::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  html::-webkit-scrollbar-track,
+  body::-webkit-scrollbar-track {
+    background: #0A0E14;
+  }
+  html::-webkit-scrollbar-thumb,
+  body::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 9999px;
+  }
+  html::-webkit-scrollbar-thumb:hover,
+  body::-webkit-scrollbar-thumb:hover {
+    background: rgba(59, 111, 240, 0.5);
+  }
+
+  h1, h2, h3, h4, h5, h6, .font-display {
+    font-family: 'Outfit', sans-serif;
+  }
+}
+
 @layer utilities {
   /* Custom thin scrollbar styling for floating islands */
   .custom-scrollbar::-webkit-scrollbar {
@@ -7,14 +42,14 @@
     height: 5px;
   }
   .custom-scrollbar::-webkit-scrollbar-track {
-    background: rgba(15, 23, 42, 0.4);
+    background: rgba(18, 24, 36, 0.6);
     border-radius: 9999px;
   }
   .custom-scrollbar::-webkit-scrollbar-thumb {
-    background: rgba(139, 92, 246, 0.4);
+    background: rgba(59, 111, 240, 0.3);
     border-radius: 9999px;
   }
   .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    background: rgba(139, 92, 246, 0.7);
+    background: rgba(59, 111, 240, 0.6);
   }
 }

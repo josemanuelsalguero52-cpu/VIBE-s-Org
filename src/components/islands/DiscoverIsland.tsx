@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { motion } from 'motion/react';
-import { Search, UserPlus, MessageCircle, Sparkles, Check, Users } from 'lucide-react';
+import { Search, UserPlus, MessageCircle, Check, Users } from 'lucide-react';
 import { UserProfile } from '../../types';
 import { apiGetUsers, getActiveUser } from '../../lib/supabase';
 
@@ -41,17 +40,17 @@ export const DiscoverIsland: React.FC<DiscoverIslandProps> = ({ onStartChatWithU
         <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
         <input
           type="text"
-          placeholder="Buscar VIBERS por nombre o @usuario..."
+          placeholder="Buscar usuarios por nombre o @usuario..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="w-full bg-slate-950/70 border border-white/10 rounded-full pl-10 pr-4 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-violet-500 transition-colors"
+          className="w-full bg-[#0A0E14] border border-white/10 rounded-lg pl-10 pr-4 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-[#3B6FF0] transition-colors"
         />
       </div>
 
       {/* Suggested Users Header */}
       <div className="flex items-center justify-between px-1 text-xs text-slate-300 font-semibold">
         <span className="flex items-center space-x-1.5">
-          <Users className="w-3.5 h-3.5 text-violet-400" />
+          <Users className="w-3.5 h-3.5 text-[#3B6FF0]" />
           <span>Comunidad VIBE</span>
         </span>
         <span className="text-[10px] text-slate-400">{filteredUsers.length} encontrados</span>
@@ -69,19 +68,19 @@ export const DiscoverIsland: React.FC<DiscoverIslandProps> = ({ onStartChatWithU
             return (
               <div
                 key={user.id}
-                className="p-3.5 rounded-2xl bg-slate-900/60 border border-white/10 hover:border-violet-500/30 transition-all flex items-center justify-between gap-3 group"
+                className="p-3.5 rounded-xl bg-[#0A0E14] border border-white/10 hover:border-white/20 transition-all flex items-center justify-between gap-3 group"
               >
                 <div className="flex items-center space-x-3 min-w-0">
                   <img
                     src={user.avatar_url}
                     alt={user.display_name}
-                    className="w-11 h-11 rounded-full object-cover ring-2 ring-violet-500/20 group-hover:ring-violet-500/40 transition-all"
+                    className="w-10 h-10 rounded-full object-cover ring-1 ring-white/10"
                   />
                   <div className="min-w-0">
-                    <h4 className="font-semibold text-xs text-slate-100 truncate group-hover:text-violet-300 transition-colors">
+                    <h4 className="font-semibold text-xs text-slate-100 truncate group-hover:text-white transition-colors">
                       {user.display_name}
                     </h4>
-                    <p className="text-[11px] text-violet-400 truncate">@{user.username}</p>
+                    <p className="text-[11px] text-slate-400 truncate">@{user.username}</p>
                     <p className="text-[11px] text-slate-400 truncate mt-0.5">{user.bio}</p>
                   </div>
                 </div>
@@ -89,20 +88,20 @@ export const DiscoverIsland: React.FC<DiscoverIslandProps> = ({ onStartChatWithU
                 <div className="flex items-center space-x-2 shrink-0">
                   <button
                     onClick={() => toggleFollow(user.id)}
-                    className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all flex items-center space-x-1 ${
+                    className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center space-x-1 ${
                       isFollowing
-                        ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                        ? 'bg-[#3B6FF0]/15 text-[#3B6FF0] border border-[#3B6FF0]/30 font-semibold'
                         : 'bg-white/5 hover:bg-white/10 text-slate-200 border border-white/10'
                     }`}
                   >
                     {isFollowing ? (
                       <>
-                        <Check className="w-3.5 h-3.5 text-emerald-400" />
+                        <Check className="w-3.5 h-3.5 text-[#3B6FF0]" />
                         <span>Siguiendo</span>
                       </>
                     ) : (
                       <>
-                        <UserPlus className="w-3.5 h-3.5 text-violet-400" />
+                        <UserPlus className="w-3.5 h-3.5 text-slate-400" />
                         <span>Seguir</span>
                       </>
                     )}
@@ -111,7 +110,7 @@ export const DiscoverIsland: React.FC<DiscoverIslandProps> = ({ onStartChatWithU
                   <button
                     onClick={() => onStartChatWithUser(user)}
                     title={`Abrir chat con @${user.username}`}
-                    className="p-2 rounded-full bg-violet-600 hover:bg-violet-500 text-white transition-all shadow-md shadow-violet-600/30"
+                    className="p-2 rounded-lg bg-[#3B6FF0] hover:bg-[#2E5EFF] text-white transition-all shadow-sm"
                   >
                     <MessageCircle className="w-3.5 h-3.5" />
                   </button>

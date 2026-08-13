@@ -37,163 +37,46 @@ if (isSupabaseConfigured) {
 // SEED DATA FOR DEMO / LOCAL STORAGE ENGINE
 // ==========================================
 
-const SEED_USERS: UserProfile[] = [
-  {
-    id: 'usr_1',
-    email: 'sofia@vibe.app',
-    username: 'sofia_design',
-    display_name: 'Sofía Valenzuela',
-    avatar_url: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80',
-    bio: 'Diseñadora UI/UX en VIBE. Creando islas y experiencias minimalistas ✨',
-    created_at: new Date(Date.now() - 86400000 * 10).toISOString(),
-    id_xion: generateIDXion(),
-    followers_count: 142,
-    following_count: 89,
-  },
-  {
-    id: 'usr_2',
-    email: 'lucas@vibe.app',
-    username: 'lucas_code',
-    display_name: 'Lucas Martínez',
-    avatar_url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=300&q=80',
-    bio: 'Desarrollador React & Supabase. Apasionado del tiempo real ⚡️',
-    created_at: new Date(Date.now() - 86400000 * 8).toISOString(),
-    id_xion: generateIDXion(),
-    followers_count: 98,
-    following_count: 45,
-  },
-  {
-    id: 'usr_3',
-    email: 'elena@vibe.app',
-    username: 'elena_music',
-    display_name: 'Elena Silva',
-    avatar_url: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=300&q=80',
-    bio: 'Productora musical & sound designer. Vibras de baja frecuencia 🎧',
-    created_at: new Date(Date.now() - 86400000 * 5).toISOString(),
-    id_xion: generateIDXion(),
-    followers_count: 230,
-    following_count: 112,
-  },
-  {
-    id: 'usr_4',
-    email: 'mateo@vibe.app',
-    username: 'mateo_vibe',
-    display_name: 'Mateo Rojas',
-    avatar_url: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=300&q=80',
-    bio: 'Explorando la arquitectura de islas flotantes. ¡Hola VIBE!',
-    created_at: new Date(Date.now() - 86400000 * 2).toISOString(),
-    id_xion: generateIDXion(),
-    followers_count: 56,
-    following_count: 30,
-  }
-];
+const SEED_USERS: UserProfile[] = [];
 
-const SEED_POSTS: Post[] = [
-  {
-    id: 'pst_1',
-    author_id: 'usr_1',
-    author: SEED_USERS[0],
-    content: '¡Bienvenidos a VIBE! 🎉 Un nuevo paradigma donde cada función es su propia isla flotante. Sin barras rígidas, sin distracciones.',
-    created_at: new Date(Date.now() - 1000 * 60 * 30).toISOString(),
-    likes_count: 24,
-    is_liked: true,
-    comments_count: 3,
-    id_xion: generateIDXion(),
-  },
-  {
-    id: 'pst_2',
-    author_id: 'usr_2',
-    author: SEED_USERS[1],
-    content: 'Probando la transmisión en tiempo real con Supabase Realtime en los chats 1 a 1. La velocidad de respuesta es impresionante ⚡️ #VIBE #Dev',
-    created_at: new Date(Date.now() - 1000 * 60 * 120).toISOString(),
-    likes_count: 18,
-    is_liked: false,
-    comments_count: 1,
-    id_xion: generateIDXion(),
-  },
-  {
-    id: 'pst_3',
-    author_id: 'usr_3',
-    author: SEED_USERS[2],
-    content: 'Componiendo una nueva pista synthwave inspirada en interfaces limpias y tarjetas flotantes. ¿A alguien le gustaría escuchar un adelanto?',
-    created_at: new Date(Date.now() - 1000 * 60 * 300).toISOString(),
-    likes_count: 42,
-    is_liked: true,
-    comments_count: 7,
-    id_xion: generateIDXion(),
-  }
-];
+const SEED_POSTS: Post[] = [];
 
-const SEED_MESSAGES: ChatMessage[] = [
-  {
-    id: 'msg_1',
-    conversation_id: 'conv_1_2',
-    sender_id: 'usr_2',
-    recipient_id: 'usr_1',
-    content: '¡Hola Sofía! ¿Qué tal va el diseño de la isla de chats?',
-    created_at: new Date(Date.now() - 1000 * 60 * 15).toISOString(),
-    is_read: true,
-    id_xion: generateIDXion(),
-  },
-  {
-    id: 'msg_2',
-    conversation_id: 'conv_1_2',
-    sender_id: 'usr_1',
-    recipient_id: 'usr_2',
-    content: '¡Hola Lucas! Quedó increíble, con animaciones de expansión suaves y mensajería en tiempo real.',
-    created_at: new Date(Date.now() - 1000 * 60 * 10).toISOString(),
-    is_read: true,
-    id_xion: generateIDXion(),
-  }
-];
+const SEED_MESSAGES: ChatMessage[] = [];
 
-const SEED_COMMENTS: PostComment[] = [
-  {
-    id: 'cmt_1',
-    post_id: 'pst_1',
-    parent_id: null,
-    author_id: 'usr_2',
-    author: SEED_USERS[1],
-    content: '¡Me encanta el diseño de las islas flotantes @sofia_design! Muy innovador.',
-    created_at: new Date(Date.now() - 1000 * 60 * 25).toISOString(),
-    likes_count: 5,
-    is_liked: true,
-    id_xion: generateIDXion(),
-  },
-  {
-    id: 'cmt_2',
-    post_id: 'pst_1',
-    parent_id: 'cmt_1',
-    author_id: 'usr_1',
-    author: SEED_USERS[0],
-    content: '¡Gracias @lucas_code! Diseñar sin barras estáticas fue el mayor reto.',
-    created_at: new Date(Date.now() - 1000 * 60 * 20).toISOString(),
-    likes_count: 3,
-    is_liked: false,
-    id_xion: generateIDXion(),
-  },
-  {
-    id: 'cmt_3',
-    post_id: 'pst_3',
-    parent_id: null,
-    author_id: 'usr_4',
-    author: SEED_USERS[3],
-    content: '¡Me apunto a escuchar ese adelanto synthwave @elena_music! 🎧',
-    created_at: new Date(Date.now() - 1000 * 60 * 200).toISOString(),
-    likes_count: 8,
-    is_liked: true,
-    id_xion: generateIDXion(),
-  }
-];
+const SEED_COMMENTS: PostComment[] = [];
 
 // Local state helpers with persistence
+const DEFAULT_USER: UserProfile = {
+  id: 'usr_me',
+  email: 'usuario@vibe.app',
+  username: 'mi_usuario',
+  display_name: 'Mi Usuario',
+  avatar_url: 'https://api.dicebear.com/7.x/bottts/svg?seed=vibe_me',
+  bio: '¡Hola! Estoy explorando VIBE.',
+  created_at: new Date().toISOString(),
+  id_xion: generateIDXion(),
+  followers_count: 0,
+  following_count: 0,
+};
+
 function getLocalUsers(): UserProfile[] {
   const stored = localStorage.getItem('vibe_demo_users');
-  if (!stored) {
-    localStorage.setItem('vibe_demo_users', JSON.stringify(SEED_USERS));
-    return SEED_USERS;
+  let users: UserProfile[] = [];
+  if (stored) {
+    try {
+      const parsed: UserProfile[] = JSON.parse(stored);
+      users = parsed.filter(u => !['usr_1', 'usr_2', 'usr_3', 'usr_4'].includes(u.id));
+    } catch {
+      users = [];
+    }
   }
-  return JSON.parse(stored);
+
+  if (users.length === 0) {
+    users = [DEFAULT_USER];
+    saveLocalUsers(users);
+  }
+
+  return users;
 }
 
 function saveLocalUsers(users: UserProfile[]) {
@@ -203,10 +86,15 @@ function saveLocalUsers(users: UserProfile[]) {
 function getLocalComments(): PostComment[] {
   const stored = localStorage.getItem('vibe_demo_comments');
   if (!stored) {
-    localStorage.setItem('vibe_demo_comments', JSON.stringify(SEED_COMMENTS));
-    return SEED_COMMENTS;
+    localStorage.setItem('vibe_demo_comments', JSON.stringify([]));
+    return [];
   }
-  return JSON.parse(stored);
+  const parsed: PostComment[] = JSON.parse(stored);
+  const cleaned = parsed.filter(c => !['cmt_1', 'cmt_2', 'cmt_3'].includes(c.id));
+  if (cleaned.length !== parsed.length) {
+    saveLocalComments(cleaned);
+  }
+  return cleaned;
 }
 
 function saveLocalComments(comments: PostComment[]) {
@@ -216,10 +104,15 @@ function saveLocalComments(comments: PostComment[]) {
 function getLocalPosts(): Post[] {
   const stored = localStorage.getItem('vibe_demo_posts');
   if (!stored) {
-    localStorage.setItem('vibe_demo_posts', JSON.stringify(SEED_POSTS));
-    return SEED_POSTS;
+    localStorage.setItem('vibe_demo_posts', JSON.stringify([]));
+    return [];
   }
-  return JSON.parse(stored);
+  const parsed: Post[] = JSON.parse(stored);
+  const cleaned = parsed.filter(p => !['pst_1', 'pst_2', 'pst_3'].includes(p.id));
+  if (cleaned.length !== parsed.length) {
+    saveLocalPosts(cleaned);
+  }
+  return cleaned;
 }
 
 function saveLocalPosts(posts: Post[]) {
@@ -229,10 +122,15 @@ function saveLocalPosts(posts: Post[]) {
 function getLocalMessages(): ChatMessage[] {
   const stored = localStorage.getItem('vibe_demo_messages');
   if (!stored) {
-    localStorage.setItem('vibe_demo_messages', JSON.stringify(SEED_MESSAGES));
-    return SEED_MESSAGES;
+    localStorage.setItem('vibe_demo_messages', JSON.stringify([]));
+    return [];
   }
-  return JSON.parse(stored);
+  const parsed: ChatMessage[] = JSON.parse(stored);
+  const cleaned = parsed.filter(m => !['msg_1', 'msg_2'].includes(m.id));
+  if (cleaned.length !== parsed.length) {
+    saveLocalMessages(cleaned);
+  }
+  return cleaned;
 }
 
 function saveLocalMessages(messages: ChatMessage[]) {
@@ -241,15 +139,15 @@ function saveLocalMessages(messages: ChatMessage[]) {
 
 export function getActiveUser(): UserProfile {
   const users = getLocalUsers();
-  const activeId = localStorage.getItem('vibe_active_user_id') || users[0].id;
+  const activeId = localStorage.getItem('vibe_active_user_id');
   const found = users.find(u => u.id === activeId);
-  return found || users[0];
+  return found || users[0] || DEFAULT_USER;
 }
 
 export function setActiveUser(userId: string): UserProfile {
   localStorage.setItem('vibe_active_user_id', userId);
   const users = getLocalUsers();
-  const found = users.find(u => u.id === userId) || users[0];
+  const found = users.find(u => u.id === userId) || users[0] || DEFAULT_USER;
   window.dispatchEvent(new CustomEvent('vibe_auth_changed', { detail: found }));
   return found;
 }

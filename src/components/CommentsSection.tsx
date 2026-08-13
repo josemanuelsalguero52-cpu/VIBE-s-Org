@@ -1,15 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
 import { 
   Heart, 
-  MessageSquare, 
   Reply, 
   Send, 
   CornerDownRight, 
   Sparkles,
-  User,
-  Clock,
-  AtSign
+  Clock
 } from 'lucide-react';
 import { PostComment, UserProfile } from '../types';
 import { 
@@ -140,7 +136,7 @@ export const CommentsSection: React.FC<CommentsSectionProps> = ({
         return (
           <span 
             key={i} 
-            className="inline-flex items-center px-1.5 py-0.2 rounded bg-violet-500/20 text-violet-300 font-semibold text-xs border border-violet-500/30"
+            className="inline-flex items-center px-1.5 py-0.2 rounded bg-[#3B6FF0]/15 text-[#3B6FF0] font-semibold text-xs border border-[#3B6FF0]/30"
           >
             {part}
           </span>
@@ -162,15 +158,15 @@ export const CommentsSection: React.FC<CommentsSectionProps> = ({
 
   const CommentNode: React.FC<{ comment: PostComment; isChild?: boolean }> = ({ comment, isChild = false }) => {
     return (
-      <div className={`space-y-2 ${isChild ? 'ml-4 sm:ml-8 pl-3 border-l-2 border-violet-500/20' : ''}`}>
-        <div className="p-3 rounded-2xl bg-slate-950/60 border border-white/5 hover:border-violet-500/30 transition-all space-y-2">
+      <div className={`space-y-2 ${isChild ? 'ml-4 sm:ml-6 pl-3 border-l-2 border-white/10' : ''}`}>
+        <div className="p-3 rounded-xl bg-[#0A0E14] border border-white/5 hover:border-white/20 transition-all space-y-2">
           {/* Header */}
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
               <img
                 src={comment.author.avatar_url || `https://api.dicebear.com/7.x/bottts/svg?seed=${comment.author.username}`}
                 alt={comment.author.display_name}
-                className="w-7 h-7 rounded-full object-cover ring-1 ring-violet-500/30"
+                className="w-6 h-6 rounded-full object-cover ring-1 ring-white/10"
               />
               <div>
                 <div className="flex items-center space-x-1.5">
@@ -192,28 +188,28 @@ export const CommentsSection: React.FC<CommentsSectionProps> = ({
             <div className="flex items-center space-x-2 text-xs">
               <button
                 onClick={() => handleLikeComment(comment.id)}
-                className={`flex items-center space-x-1 px-2 py-0.5 rounded-full transition-all text-[11px] ${
+                className={`flex items-center space-x-1 px-2 py-0.5 rounded-lg transition-all text-[11px] ${
                   comment.is_liked
-                    ? 'bg-rose-500/20 text-rose-400 border border-rose-500/30 font-semibold'
+                    ? 'bg-[#3B6FF0]/15 text-[#3B6FF0] border border-[#3B6FF0]/30 font-semibold'
                     : 'text-slate-400 hover:text-slate-200 hover:bg-white/5'
                 }`}
               >
-                <Heart className={`w-3 h-3 ${comment.is_liked ? 'fill-rose-500 text-rose-500' : ''}`} />
+                <Heart className={`w-3 h-3 ${comment.is_liked ? 'fill-[#3B6FF0] text-[#3B6FF0]' : ''}`} />
                 <span>{comment.likes_count || 0}</span>
               </button>
 
               <button
                 onClick={() => handleStartReply(comment)}
-                className="flex items-center space-x-1 text-[11px] text-slate-400 hover:text-violet-300 transition-colors px-2 py-0.5 rounded-full hover:bg-white/5"
+                className="flex items-center space-x-1 text-[11px] text-slate-400 hover:text-white transition-colors px-2 py-0.5 rounded-lg hover:bg-white/5"
               >
-                <Reply className="w-3 h-3 text-violet-400" />
+                <Reply className="w-3 h-3 text-slate-400" />
                 <span>Responder</span>
               </button>
             </div>
           </div>
 
           {/* Comment text */}
-          <p className="text-xs text-slate-200 leading-relaxed break-words pl-1">
+          <p className="text-xs text-slate-200 leading-relaxed break-words pl-0.5">
             {renderCommentContent(comment.content)}
           </p>
         </div>
@@ -234,9 +230,9 @@ export const CommentsSection: React.FC<CommentsSectionProps> = ({
     <div className="mt-4 pt-3 border-t border-white/10 space-y-4">
       {/* Reply Banner if Replying to a specific comment */}
       {replyingToComment && (
-        <div className="flex items-center justify-between bg-violet-950/50 border border-violet-500/30 rounded-xl px-3 py-2 text-xs text-violet-200">
+        <div className="flex items-center justify-between bg-[#121824] border border-[#3B6FF0]/30 rounded-lg px-3 py-2 text-xs text-slate-200">
           <div className="flex items-center space-x-1.5 truncate">
-            <CornerDownRight className="w-3.5 h-3.5 text-violet-400 shrink-0" />
+            <CornerDownRight className="w-3.5 h-3.5 text-[#3B6FF0] shrink-0" />
             <span>Respondiendo a <strong>@{replyingToComment.author.username}</strong></span>
           </div>
           <button 
@@ -256,7 +252,7 @@ export const CommentsSection: React.FC<CommentsSectionProps> = ({
         <img
           src={currentUser.avatar_url}
           alt={currentUser.display_name}
-          className="w-8 h-8 rounded-full object-cover ring-1 ring-violet-500/40"
+          className="w-8 h-8 rounded-full object-cover ring-1 ring-white/10"
         />
         <div className="relative flex-1">
           <input
@@ -268,15 +264,15 @@ export const CommentsSection: React.FC<CommentsSectionProps> = ({
                 ? `Escribe tu respuesta a @${replyingToComment.author.username}...` 
                 : "Añadir un comentario o mención (@usuario)..."
             }
-            className="w-full bg-slate-950 border border-white/10 rounded-full pl-4 pr-10 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-violet-500 transition-colors"
+            className="w-full bg-[#0A0E14] border border-white/10 rounded-lg pl-3 pr-10 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-[#3B6FF0] transition-colors"
           />
           <button
             type="submit"
             disabled={!newCommentText.trim() || submitting}
-            className={`absolute right-1 top-1/2 -translate-y-1/2 p-1.5 rounded-full transition-all ${
+            className={`absolute right-1 top-1/2 -translate-y-1/2 p-1.5 rounded-md transition-all ${
               newCommentText.trim() && !submitting
-                ? 'bg-violet-600 text-white hover:bg-violet-500 shadow-md shadow-violet-600/30'
-                : 'bg-slate-800 text-slate-500 cursor-not-allowed'
+                ? 'bg-[#3B6FF0] hover:bg-[#2E5EFF] text-white shadow-md shadow-[#3B6FF0]/20'
+                : 'bg-white/5 text-slate-600 cursor-not-allowed'
             }`}
           >
             <Send className="w-3.5 h-3.5" />
@@ -285,10 +281,10 @@ export const CommentsSection: React.FC<CommentsSectionProps> = ({
       </form>
 
       {/* Comment List Stream */}
-      <div className="space-y-3 pt-1">
+      <div className="space-y-2.5 pt-1">
         {loading ? (
           <div className="flex items-center justify-center py-4 text-xs text-slate-400 space-x-2">
-            <Sparkles className="w-3.5 h-3.5 animate-spin text-violet-400" />
+            <Sparkles className="w-3.5 h-3.5 animate-spin text-[#3B6FF0]" />
             <span>Cargando comentarios...</span>
           </div>
         ) : commentTree.length === 0 ? (

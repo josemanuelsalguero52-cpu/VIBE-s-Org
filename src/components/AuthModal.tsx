@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { X, User, Mail, Lock, Sparkles, ArrowRight, CheckCircle2, ShieldCheck } from 'lucide-react';
+import { X, User, Mail, Lock, ArrowRight, Sparkles } from 'lucide-react';
 import { apiSignUp, apiSignIn } from '../lib/supabase';
+import vibeLogoBlue from '../assets/icons/vibe-logo-blue.svg';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -67,28 +68,28 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md">
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#0A0E14]/80 backdrop-blur-sm">
         <motion.div
-          initial={{ opacity: 0, scale: 0.9, y: 20 }}
+          initial={{ opacity: 0, scale: 0.95, y: 12 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.9, y: 20 }}
-          className="relative w-full max-w-md bg-slate-900 border border-violet-500/30 rounded-3xl p-6 shadow-2xl shadow-violet-950/50 space-y-5"
+          exit={{ opacity: 0, scale: 0.95, y: 12 }}
+          className="relative w-full max-w-md bg-[#121824] border border-white/10 rounded-2xl p-6 shadow-2xl space-y-5"
         >
           {/* Close button */}
           <button
             onClick={onClose}
-            className="absolute right-4 top-4 p-2 text-slate-400 hover:text-white rounded-full bg-white/5 hover:bg-white/10 transition-colors"
+            className="absolute right-4 top-4 p-2 text-slate-400 hover:text-white rounded-lg bg-white/5 hover:bg-white/10 transition-colors"
           >
             <X className="w-4 h-4" />
           </button>
 
           {/* Header */}
           <div className="text-center space-y-1">
-            <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-violet-600/20 border border-violet-500/30 text-violet-300 text-xs font-semibold">
-              <Sparkles className="w-3.5 h-3.5" />
+            <div className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-md bg-[#3B6FF0]/15 border border-[#3B6FF0]/30 text-[#3B6FF0] text-xs font-semibold">
+              <img src={vibeLogoBlue} alt="VIBE Logo" className="w-3.5 h-3.5 object-contain" />
               <span>Red Social VIBE</span>
             </div>
-            <h3 className="text-xl font-bold text-white pt-2">
+            <h3 className="font-display text-xl font-bold text-white pt-2">
               {mode === 'signup' ? 'Crear tu cuenta en VIBE' : 'Iniciar Sesión en VIBE'}
             </h3>
             <p className="text-xs text-slate-400">
@@ -99,7 +100,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-3.5">
             {errorMsg && (
-              <div className="p-3 bg-rose-500/20 border border-rose-500/40 text-rose-300 text-xs rounded-xl">
+              <div className="p-3 bg-[#0A0E14] border border-white/15 text-slate-200 text-xs rounded-lg">
                 {errorMsg}
               </div>
             )}
@@ -118,7 +119,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
                       value={username}
                       onChange={(e) => setUsername(e.target.value)}
                       placeholder="ej: alex_vibe"
-                      className="w-full bg-slate-950 border border-white/10 rounded-xl pl-9 pr-3 py-2 text-xs text-white placeholder-slate-600 focus:outline-none focus:border-violet-500 transition-colors"
+                      className="w-full bg-[#0A0E14] border border-white/10 rounded-lg pl-9 pr-3 py-2 text-xs text-white placeholder-slate-600 focus:outline-none focus:border-[#3B6FF0] transition-colors"
                     />
                   </div>
                 </div>
@@ -132,7 +133,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
                     value={displayName}
                     onChange={(e) => setDisplayName(e.target.value)}
                     placeholder="ej: Alex Rivera"
-                    className="w-full bg-slate-950 border border-white/10 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-600 focus:outline-none focus:border-violet-500 transition-colors"
+                    className="w-full bg-[#0A0E14] border border-white/10 rounded-lg px-3 py-2 text-xs text-white placeholder-slate-600 focus:outline-none focus:border-[#3B6FF0] transition-colors"
                   />
                 </div>
               </>
@@ -150,7 +151,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="tu@email.com"
-                  className="w-full bg-slate-950 border border-white/10 rounded-xl pl-9 pr-3 py-2 text-xs text-white placeholder-slate-600 focus:outline-none focus:border-violet-500 transition-colors"
+                  className="w-full bg-[#0A0E14] border border-white/10 rounded-lg pl-9 pr-3 py-2 text-xs text-white placeholder-slate-600 focus:outline-none focus:border-[#3B6FF0] transition-colors"
                 />
               </div>
             </div>
@@ -167,7 +168,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full bg-slate-950 border border-white/10 rounded-xl pl-9 pr-3 py-2 text-xs text-white placeholder-slate-600 focus:outline-none focus:border-violet-500 transition-colors"
+                  className="w-full bg-[#0A0E14] border border-white/10 rounded-lg pl-9 pr-3 py-2 text-xs text-white placeholder-slate-600 focus:outline-none focus:border-[#3B6FF0] transition-colors"
                 />
               </div>
             </div>
@@ -175,7 +176,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-2.5 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white font-semibold text-xs transition-all shadow-lg shadow-violet-600/30 flex items-center justify-center space-x-2"
+              className="w-full py-2.5 rounded-lg bg-[#3B6FF0] hover:bg-[#2E5EFF] text-white font-semibold text-xs transition-all shadow-md shadow-[#3B6FF0]/20 flex items-center justify-center space-x-2"
             >
               {loading ? (
                 <>
@@ -199,7 +200,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
                 <button
                   type="button"
                   onClick={() => setMode('login')}
-                  className="text-violet-400 hover:text-violet-300 font-semibold underline"
+                  className="text-[#3B6FF0] hover:text-[#2E5EFF] font-semibold underline"
                 >
                   Inicia sesión aquí
                 </button>
@@ -210,7 +211,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
                 <button
                   type="button"
                   onClick={() => setMode('signup')}
-                  className="text-violet-400 hover:text-violet-300 font-semibold underline"
+                  className="text-[#3B6FF0] hover:text-[#2E5EFF] font-semibold underline"
                 >
                   Regístrate en 5 segundos
                 </button>
