@@ -1,0 +1,6 @@
+{
+  "name": "VIBE - Red Social de Islas",
+  "description": "Red social minimalista con arquitectura de Islas flotantes, posts de 280 caracteres, chats 1 a 1 en tiempo real e identificación trazable ID XION.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
