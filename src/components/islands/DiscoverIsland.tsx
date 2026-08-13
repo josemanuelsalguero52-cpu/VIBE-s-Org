@@ -16,9 +16,13 @@ export const DiscoverIsland: React.FC<DiscoverIslandProps> = ({ onStartChatWithU
 
   useEffect(() => {
     apiGetUsers().then(all => {
-      setUsers(all.filter(u => u.id !== currentUser.id));
+      if (currentUser?.id) {
+        setUsers(all.filter(u => u.id !== currentUser.id));
+      } else {
+        setUsers(all);
+      }
     });
-  }, [currentUser.id]);
+  }, [currentUser?.id]);
 
   const toggleFollow = (userId: string) => {
     setFollowingMap(prev => ({

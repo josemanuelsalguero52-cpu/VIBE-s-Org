@@ -95,6 +95,8 @@ export const NotificationsIsland: React.FC = () => {
   const currentUser = getActiveUser();
 
   useEffect(() => {
+    if (!currentUser) return;
+
     // Listen to real-time mentions and messages
     const unsubPush = initPushNotificationListeners(
       (msg) => {
@@ -140,7 +142,7 @@ export const NotificationsIsland: React.FC = () => {
     return () => {
       unsubPush();
     };
-  }, [currentUser.id]);
+  }, [currentUser?.id]);
 
   const handleEnablePush = async () => {
     await requestNotificationPermission();
@@ -156,7 +158,7 @@ export const NotificationsIsland: React.FC = () => {
 
     const testNotif: NotificationItem = {
       id: `notif_test_${Date.now()}`,
-      user_id: currentUser.id,
+      user_id: currentUser?.id || 'usr_active',
       type: 'message',
       actor: {
         id: 'usr_1',
@@ -177,15 +179,16 @@ export const NotificationsIsland: React.FC = () => {
   };
 
   const handleTestMentionPush = () => {
+    const uname = currentUser?.username || 'usuario';
     sendNativePushNotification(
       `🏷️ [Prueba Push VIBE] Mención de @lucas_code`,
-      `@${currentUser.username} ¡Acabo de probar las notificaciones push en VIBE Realtime! 🔥`,
+      `@${uname} ¡Acabo de probar las notificaciones push en VIBE Realtime! 🔥`,
       { action: 'open_feed' }
     );
 
     const testNotif: NotificationItem = {
       id: `notif_mention_test_${Date.now()}`,
-      user_id: currentUser.id,
+      user_id: currentUser?.id || 'usr_active',
       type: 'mention',
       actor: {
         id: 'usr_2',
@@ -197,7 +200,7 @@ export const NotificationsIsland: React.FC = () => {
         created_at: '',
         id_xion: generateIDXion(),
       },
-      message: `te mencionó en VIBE: "@${currentUser.username} ¡Proba las notificaciones push!"`,
+      message: `te mencionó en VIBE: "@${uname} ¡Proba las notificaciones push!"`,
       created_at: new Date().toISOString(),
       is_read: false,
       id_xion: generateIDXion(),

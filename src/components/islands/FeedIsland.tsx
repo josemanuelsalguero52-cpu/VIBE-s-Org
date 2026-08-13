@@ -301,8 +301,8 @@ export const FeedIsland: React.FC<FeedIslandProps> = ({
       >
         <div className="flex items-start space-x-3">
           <img
-            src={currentUser.avatar_url}
-            alt={currentUser.display_name}
+            src={currentUser?.avatar_url || 'https://api.dicebear.com/7.x/bottts/svg?seed=vibe'}
+            alt={currentUser?.display_name || 'Usuario'}
             className="w-9 h-9 rounded-full object-cover ring-1 ring-white/10 shrink-0 mt-0.5"
           />
           <div className="flex-1 space-y-2">

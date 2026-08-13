@@ -6,7 +6,10 @@ import {
   Heart, 
   ShieldCheck,
   Clock,
-  Edit3
+  Edit3,
+  LogOut,
+  UserPlus,
+  LogIn
 } from 'lucide-react';
 import { UserProfile, Post } from '../../types';
 import { 
@@ -14,34 +17,41 @@ import {
   apiUpdateProfile, 
   apiGetPosts, 
   apiGetUsers, 
-  setActiveUser 
+  apiSignOut
 } from '../../lib/supabase';
 
 interface ProfileIslandProps {
   onOpenAuth: () => void;
+  onOpenAuthWithMode?: (mode: 'login' | 'signup') => void;
 }
 
-export const ProfileIsland: React.FC<ProfileIslandProps> = ({ onOpenAuth }) => {
-  const [user, setUser] = useState<UserProfile>(getActiveUser());
+export const ProfileIsland: React.FC<ProfileIslandProps> = ({ onOpenAuth, onOpenAuthWithMode }) => {
+  const [user, setUser] = useState<UserProfile | null>(getActiveUser());
   const [isEditing, setIsEditing] = useState<boolean>(false);
-  const [displayName, setDisplayName] = useState<string>(user.display_name);
-  const [bio, setBio] = useState<string>(user.bio);
-  const [avatarUrl, setAvatarUrl] = useState<string>(user.avatar_url);
+  const [displayName, setDisplayName] = useState<string>(user?.display_name || '');
+  const [bio, setBio] = useState<string>(user?.bio || '');
+  const [avatarUrl, setAvatarUrl] = useState<string>(user?.avatar_url || '');
   const [myPosts, setMyPosts] = useState<Post[]>([]);
   const [saving, setSaving] = useState<boolean>(false);
 
   useEffect(() => {
     const handleAuthChange = () => {
       const active = getActiveUser();
-      setUser(active);
-      setDisplayName(active.display_name);
-      setBio(active.bio);
-      setAvatarUrl(active.avatar_url);
-      fetchUserPosts(active.id);
+      if (active) {
+        setUser(active);
+        setDisplayName(active.display_name);
+        setBio(active.bio);
+        setAvatarUrl(active.avatar_url);
+        fetchUserPosts(active.id);
+      } else {
+        setUser(null);
+      }
     };
 
     window.addEventListener('vibe_auth_changed' as any, handleAuthChange);
-    handleAuthChange();
+    if (user?.id) {
+      fetchUserPosts(user.id);
+    }
 
     apiGetUsers();
 
@@ -95,6 +105,14 @@ export const ProfileIsland: React.FC<ProfileIslandProps> = ({ onOpenAuth }) => {
       reader.readAsDataURL(file);
     }
   };
+
+  if (!user) {
+    return (
+      <div className="text-center py-12 text-slate-400 text-xs">
+        Debes iniciar sesión para ver tu perfil.
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col h-full min-h-0 overflow-y-auto custom-scrollbar space-y-4 pr-1">
@@ -220,17 +238,35 @@ export const ProfileIsland: React.FC<ProfileIslandProps> = ({ onOpenAuth }) => {
       </div>
 
       {/* Account Management Card */}
-      <div className="bg-[#0A0E14] border border-white/10 rounded-xl p-3 flex items-center justify-between">
-        <div className="flex items-center space-x-2">
-          <ShieldCheck className="w-4 h-4 text-[#3B6FF0]" />
-          <span className="text-xs text-slate-300">Gestión de Cuentas:</span>
+      <div className="bg-[#0A0E14] border border-white/10 rounded-xl p-3 flex flex-col sm:flex-row items-center justify-between gap-2.5">
+        <div className="flex items-center space-x-2 text-slate-300 text-xs">
+          <ShieldCheck className="w-4 h-4 text-[#3B6FF0] shrink-0" />
+          <span className="font-medium">Gestión de Autenticación:</span>
         </div>
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-2 w-full sm:w-auto justify-end">
           <button
-            onClick={onOpenAuth}
-            className="px-3 py-1.5 rounded-lg bg-[#3B6FF0] hover:bg-[#2E5EFF] text-white text-xs font-medium transition-all shadow-sm"
+            onClick={() => onOpenAuthWithMode ? onOpenAuthWithMode('login') : onOpenAuth()}
+            className="px-2.5 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-slate-200 text-xs font-medium border border-white/10 transition-all flex items-center space-x-1"
           >
-            Reg. / Iniciar Sesión
+            <LogIn className="w-3.5 h-3.5 text-[#3B6FF0]" />
+            <span>Iniciar Sesión</span>
+          </button>
+          <button
+            onClick={() => onOpenAuthWithMode ? onOpenAuthWithMode('signup') : onOpenAuth()}
+            className="px-3 py-1.5 rounded-lg bg-[#3B6FF0] hover:bg-[#2E5EFF] text-white text-xs font-semibold transition-all shadow-sm flex items-center space-x-1"
+          >
+            <UserPlus className="w-3.5 h-3.5" />
+            <span>Crear Cuenta</span>
+          </button>
+          <button
+            onClick={async () => {
+              await apiSignOut();
+            }}
+            className="px-2.5 py-1.5 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 text-xs font-medium border border-rose-500/20 transition-all flex items-center space-x-1"
+            title="Cerrar sesión actual"
+          >
+            <LogOut className="w-3.5 h-3.5" />
+            <span className="hidden xs:inline">Salir</span>
           </button>
         </div>
       </div>

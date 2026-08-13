@@ -250,8 +250,8 @@ export const CommentsSection: React.FC<CommentsSectionProps> = ({
       {/* Write Comment Box */}
       <form onSubmit={(e) => handlePostComment(e, replyingToComment?.id)} className="flex items-center space-x-2">
         <img
-          src={currentUser.avatar_url}
-          alt={currentUser.display_name}
+          src={currentUser?.avatar_url || 'https://api.dicebear.com/7.x/bottts/svg?seed=vibe'}
+          alt={currentUser?.display_name || 'Usuario'}
           className="w-8 h-8 rounded-full object-cover ring-1 ring-white/10"
         />
         <div className="relative flex-1">

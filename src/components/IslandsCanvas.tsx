@@ -6,7 +6,14 @@ import {
   User, 
   X, 
   Maximize2,
-  ChevronRight
+  ChevronRight,
+  LogIn,
+  UserPlus,
+  LogOut,
+  Bell,
+  Search,
+  PlusCircle,
+  Database
 } from 'lucide-react';
 import { IslandId, UserProfile } from '../types';
 import { FeedIsland } from './islands/FeedIsland';
@@ -17,7 +24,8 @@ import { DiscoverIsland } from './islands/DiscoverIsland';
 import { NotificationsIsland } from './islands/NotificationsIsland';
 import { SupabaseSetupIsland } from './islands/SupabaseSetupIsland';
 import { AuthModal } from './AuthModal';
-import { getActiveUser } from '../lib/supabase';
+import { AuthScreen } from './AuthScreen';
+import { getActiveUser, apiSignOut } from '../lib/supabase';
 import vibeLogoWhite from '../assets/icons/vibe-logo-white.svg';
 
 interface IslandMeta {
@@ -31,9 +39,10 @@ interface IslandMeta {
 
 export const IslandsCanvas: React.FC = () => {
   const [activeIsland, setActiveIsland] = useState<IslandId | null>('feed');
-  const [activeUser, setActiveUser] = useState<UserProfile>(getActiveUser());
+  const [activeUser, setActiveUser] = useState<UserProfile | null>(getActiveUser());
   const [targetChatUser, setTargetChatUser] = useState<UserProfile | null>(null);
   const [isAuthOpen, setIsAuthOpen] = useState<boolean>(false);
+  const [authMode, setAuthMode] = useState<'login' | 'signup'>('signup');
 
   useEffect(() => {
     const handleAuthChange = () => {
@@ -45,16 +54,36 @@ export const IslandsCanvas: React.FC = () => {
     };
   }, []);
 
+  const openAuthWithMode = (mode: 'login' | 'signup') => {
+    setAuthMode(mode);
+    setIsAuthOpen(true);
+  };
+
   const handleStartChatWithUser = (user: UserProfile) => {
     setTargetChatUser(user);
     setActiveIsland('chats');
   };
 
+  const handleSignOut = async () => {
+    await apiSignOut();
+    setActiveUser(null);
+  };
+
+  // Mandatory Authentication Gate
+  if (!activeUser) {
+    return (
+      <AuthScreen 
+        onSuccess={(user) => setActiveUser(user)} 
+        initialMode="login" 
+      />
+    );
+  }
+
   const islandsList: IslandMeta[] = [
     {
       id: 'feed',
       title: 'Feed Principal',
-      subtitle: 'Posts cronológicos y publicación estilo X',
+      subtitle: 'Posts cronológicos y publicaciones en tiempo real',
       icon: <Radio className="w-5 h-5 text-[#3B6FF0]" />,
       badge: 'En vivo',
       positionClass: 'md:col-span-2 md:row-span-2',
@@ -94,7 +123,12 @@ export const IslandsCanvas: React.FC = () => {
       case 'chats':
         return <ChatsIsland initialTargetUser={targetChatUser} />;
       case 'profile':
-        return <ProfileIsland onOpenAuth={() => setIsAuthOpen(true)} />;
+        return (
+          <ProfileIsland 
+            onOpenAuth={() => openAuthWithMode('signup')}
+            onOpenAuthWithMode={openAuthWithMode} 
+          />
+        );
       case 'discover':
         return <DiscoverIsland onStartChatWithUser={handleStartChatWithUser} />;
       case 'notifications':
@@ -127,32 +161,46 @@ export const IslandsCanvas: React.FC = () => {
                 VIBE
               </span>
               <span className="text-[9px] sm:text-[10px] px-1.5 py-0.2 sm:px-2 sm:py-0.5 rounded-md bg-[#3B6FF0]/15 text-[#3B6FF0] font-semibold border border-[#3B6FF0]/25">
-                MOBILE
+                ISLAS
               </span>
             </div>
             <p className="text-[10px] sm:text-[11px] text-slate-400 hidden xs:block">Red Social Adaptativa</p>
           </div>
         </div>
 
-        {/* User Account Badge */}
-        <div 
-          onClick={() => setActiveIsland('profile')}
-          className="group cursor-pointer bg-[#121824] border border-white/10 px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-2xl shadow-lg flex items-center space-x-2 sm:space-x-3 hover:border-[#3B6FF0]/40 transition-all"
-        >
-          <div className="relative shrink-0">
-            <img
-              src={activeUser.avatar_url}
-              alt={activeUser.display_name}
-              className="w-7 h-7 sm:w-8 sm:h-8 rounded-full object-cover ring-2 ring-white/10 group-hover:ring-[#3B6FF0]/50 transition-all"
-            />
-            <span className="absolute bottom-0 right-0 w-2 h-2 sm:w-2.5 sm:h-2.5 bg-[#3B6FF0] rounded-full ring-2 ring-[#0A0E14]" />
+        {/* Header Right Actions */}
+        <div className="flex items-center space-x-2">
+          {/* User Account Badge */}
+          <div 
+            onClick={() => setActiveIsland('profile')}
+            className="group cursor-pointer bg-[#121824] border border-white/10 px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-2xl shadow-lg flex items-center space-x-2 sm:space-x-3 hover:border-[#3B6FF0]/40 transition-all"
+            title="Ver mi perfil"
+          >
+            <div className="relative shrink-0">
+              <img
+                src={activeUser?.avatar_url || 'https://api.dicebear.com/7.x/bottts/svg?seed=vibe'}
+                alt={activeUser?.display_name || 'Usuario'}
+                className="w-7 h-7 sm:w-8 sm:h-8 rounded-full object-cover ring-2 ring-white/10 group-hover:ring-[#3B6FF0]/50 transition-all"
+              />
+              <span className="absolute bottom-0 right-0 w-2 h-2 sm:w-2.5 sm:h-2.5 bg-[#3B6FF0] rounded-full ring-2 ring-[#0A0E14]" />
+            </div>
+            <div className="hidden sm:block text-left">
+              <span className="block font-medium text-xs text-slate-200 group-hover:text-white transition-colors">
+                {activeUser?.display_name}
+              </span>
+              <span className="block text-[10px] text-slate-400">@{activeUser?.username}</span>
+            </div>
           </div>
-          <div className="hidden sm:block text-left">
-            <span className="block font-medium text-xs text-slate-200 group-hover:text-white transition-colors">
-              {activeUser.display_name}
-            </span>
-            <span className="block text-[10px] text-slate-400">@{activeUser.username}</span>
-          </div>
+
+          {/* Sign Out Button */}
+          <button
+            onClick={handleSignOut}
+            className="px-3 py-2 rounded-2xl bg-[#121824] hover:bg-rose-500/20 text-slate-400 hover:text-rose-300 border border-white/10 hover:border-rose-500/30 transition-all flex items-center space-x-1.5 text-xs font-semibold shadow-lg"
+            title="Cerrar sesión"
+          >
+            <LogOut className="w-4 h-4 text-rose-400" />
+            <span className="hidden md:inline">Salir</span>
+          </button>
         </div>
       </header>
 
@@ -258,7 +306,11 @@ export const IslandsCanvas: React.FC = () => {
       </main>
 
       {/* Auth Modal */}
-      <AuthModal isOpen={isAuthOpen} onClose={() => setIsAuthOpen(false)} />
+      <AuthModal 
+        isOpen={isAuthOpen} 
+        onClose={() => setIsAuthOpen(false)} 
+        initialMode={authMode}
+      />
     </div>
   );
 };

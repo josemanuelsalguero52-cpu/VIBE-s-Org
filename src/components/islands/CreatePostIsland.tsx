@@ -12,6 +12,15 @@ export const CreatePostIsland: React.FC<CreatePostIslandProps> = ({ onPostPublis
   const [successMsg, setSuccessMsg] = useState<boolean>(false);
 
   const activeUser = getActiveUser();
+
+  if (!activeUser) {
+    return (
+      <div className="p-6 text-center text-xs text-slate-400 bg-[#0A0E14] rounded-xl border border-white/10">
+        Debes iniciar sesión para crear una publicación.
+      </div>
+    );
+  }
+
   const maxChars = 280;
   const remaining = maxChars - content.length;
   const progressPercent = Math.min(100, (content.length / maxChars) * 100);

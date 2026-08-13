@@ -127,7 +127,7 @@ export const ChatsIsland: React.FC<ChatsIslandProps> = ({ initialTargetUser }) =
   const loadUsersList = async () => {
     try {
       const allUsers = await apiGetUsers();
-      const filtered = allUsers.filter(u => u.id !== currentUser.id);
+      const filtered = currentUser?.id ? allUsers.filter(u => u.id !== currentUser.id) : allUsers;
       setUsers(filtered);
       if (!activeChatUser && !initialTargetUser && filtered.length > 0) {
         setActiveChatUser(filtered[0]);
@@ -628,7 +628,7 @@ export const ChatsIsland: React.FC<ChatsIslandProps> = ({ initialTargetUser }) =
                   </div>
                 ) : (
                   filteredMessages.map((msg) => {
-                    const isMe = msg.sender_id === currentUser.id;
+                    const isMe = currentUser ? msg.sender_id === currentUser.id : false;
                     const isSystemCallMsg = msg.content.includes('Llamada') || msg.content.includes('Videollamada');
 
                     return (

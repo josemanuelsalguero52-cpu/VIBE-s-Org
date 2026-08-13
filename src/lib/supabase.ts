@@ -46,36 +46,17 @@ const SEED_MESSAGES: ChatMessage[] = [];
 const SEED_COMMENTS: PostComment[] = [];
 
 // Local state helpers with persistence
-const DEFAULT_USER: UserProfile = {
-  id: 'usr_me',
-  email: 'usuario@vibe.app',
-  username: 'mi_usuario',
-  display_name: 'Mi Usuario',
-  avatar_url: 'https://api.dicebear.com/7.x/bottts/svg?seed=vibe_me',
-  bio: '¡Hola! Estoy explorando VIBE.',
-  created_at: new Date().toISOString(),
-  id_xion: generateIDXion(),
-  followers_count: 0,
-  following_count: 0,
-};
-
 function getLocalUsers(): UserProfile[] {
   const stored = localStorage.getItem('vibe_demo_users');
   let users: UserProfile[] = [];
   if (stored) {
     try {
       const parsed: UserProfile[] = JSON.parse(stored);
-      users = parsed.filter(u => !['usr_1', 'usr_2', 'usr_3', 'usr_4'].includes(u.id));
+      users = parsed.filter(u => !['usr_1', 'usr_2', 'usr_3', 'usr_4', 'usr_me'].includes(u.id));
     } catch {
       users = [];
     }
   }
-
-  if (users.length === 0) {
-    users = [DEFAULT_USER];
-    saveLocalUsers(users);
-  }
-
   return users;
 }
 
@@ -137,17 +118,22 @@ function saveLocalMessages(messages: ChatMessage[]) {
   localStorage.setItem('vibe_demo_messages', JSON.stringify(messages));
 }
 
-export function getActiveUser(): UserProfile {
-  const users = getLocalUsers();
+export function getActiveUser(): UserProfile | null {
   const activeId = localStorage.getItem('vibe_active_user_id');
-  const found = users.find(u => u.id === activeId);
-  return found || users[0] || DEFAULT_USER;
+  if (!activeId) return null;
+  const users = getLocalUsers();
+  return users.find(u => u.id === activeId) || null;
 }
 
-export function setActiveUser(userId: string): UserProfile {
+export function setActiveUser(userId: string | null): UserProfile | null {
+  if (!userId) {
+    localStorage.removeItem('vibe_active_user_id');
+    window.dispatchEvent(new CustomEvent('vibe_auth_changed', { detail: null }));
+    return null;
+  }
   localStorage.setItem('vibe_active_user_id', userId);
   const users = getLocalUsers();
-  const found = users.find(u => u.id === userId) || users[0] || DEFAULT_USER;
+  const found = users.find(u => u.id === userId) || null;
   window.dispatchEvent(new CustomEvent('vibe_auth_changed', { detail: found }));
   return found;
 }
@@ -176,9 +162,17 @@ export function broadcastLocalEvent(channel: string, data: any) {
 // UNIFIED AUTH & DATA ENGINE
 // ==========================================
 
-export async function apiSignUp(email: string, password: string, username: string, displayName: string): Promise<{ user: UserProfile; error?: string }> {
+export async function apiSignUp(
+  email: string, 
+  password: string, 
+  username: string, 
+  displayName: string,
+  avatarUrl?: string
+): Promise<{ user: UserProfile; error?: string }> {
   const cleanUsername = username.trim().toLowerCase().replace(/[^a-z0-9_]/g, '');
-  if (!cleanUsername) return { user: null as any, error: 'El nombre de usuario no es válido' };
+  if (!cleanUsername) return { user: null as any, error: 'El nombre de usuario no es válido (usa solo letras, números y guiones bajos)' };
+
+  const chosenAvatar = avatarUrl || `https://api.dicebear.com/7.x/bottts/svg?seed=${cleanUsername}_${Date.now()}`;
 
   if (supabase) {
     try {
@@ -189,6 +183,7 @@ export async function apiSignUp(email: string, password: string, username: strin
           data: {
             username: cleanUsername,
             display_name: displayName,
+            avatar_url: chosenAvatar
           }
         }
       });
@@ -201,7 +196,7 @@ export async function apiSignUp(email: string, password: string, username: strin
           email: email,
           username: cleanUsername,
           display_name: displayName || cleanUsername,
-          avatar_url: `https://api.dicebear.com/7.x/bottts/svg?seed=${cleanUsername}`,
+          avatar_url: chosenAvatar,
           bio: '¡Hola! Soy nuevo en VIBE.',
           id_xion,
         };
@@ -220,16 +215,19 @@ export async function apiSignUp(email: string, password: string, username: strin
 
   // Fallback to local demo engine
   const users = getLocalUsers();
-  if (users.some(u => u.username === cleanUsername)) {
-    return { user: null as any, error: 'Este nombre de usuario ya está en uso' };
+  if (users.some(u => u.username.toLowerCase() === cleanUsername.toLowerCase())) {
+    return { user: null as any, error: 'Este nombre de usuario ya está registrado' };
+  }
+  if (users.some(u => u.email.toLowerCase() === email.trim().toLowerCase())) {
+    return { user: null as any, error: 'Este correo electrónico ya está registrado' };
   }
 
   const newUser: UserProfile = {
     id: `usr_${Date.now()}`,
-    email,
+    email: email.trim(),
     username: cleanUsername,
-    display_name: displayName || cleanUsername,
-    avatar_url: `https://api.dicebear.com/7.x/bottts/svg?seed=${cleanUsername}`,
+    display_name: displayName.trim() || cleanUsername,
+    avatar_url: chosenAvatar,
     bio: '¡Hola! Soy nuevo en VIBE.',
     created_at: new Date().toISOString(),
     id_xion: generateIDXion(),
@@ -237,18 +235,28 @@ export async function apiSignUp(email: string, password: string, username: strin
     following_count: 0,
   };
 
+  // Save local password mapping for demo sign-in validation
+  try {
+    const passwords = JSON.parse(localStorage.getItem('vibe_demo_passwords') || '{}');
+    passwords[newUser.id] = password;
+    localStorage.setItem('vibe_demo_passwords', JSON.stringify(passwords));
+  } catch (e) {
+    console.error(e);
+  }
+
   users.push(newUser);
   saveLocalUsers(users);
   setActiveUser(newUser.id);
   return { user: newUser };
 }
 
-export async function apiSignIn(email: string, password: string): Promise<{ user: UserProfile; error?: string }> {
+export async function apiSignIn(emailOrUsername: string, password: string): Promise<{ user: UserProfile; error?: string }> {
+  const query = emailOrUsername.trim().toLowerCase();
+
   if (supabase) {
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) return { user: null as any, error: error.message };
-      if (data.user) {
+      const { data, error } = await supabase.auth.signInWithPassword({ email: query, password });
+      if (!error && data.user) {
         const { data: prof } = await supabase.from('profiles').select('*').eq('id', data.user.id).single();
         if (prof) {
           setActiveUser(prof.id);
@@ -262,12 +270,41 @@ export async function apiSignIn(email: string, password: string): Promise<{ user
 
   // Local fallback search by email or username
   const users = getLocalUsers();
-  const found = users.find(u => u.email.toLowerCase() === email.toLowerCase() || u.username.toLowerCase() === email.toLowerCase());
+  const found = users.find(u => 
+    u.email.toLowerCase() === query || 
+    u.username.toLowerCase() === query ||
+    `@${u.username.toLowerCase()}` === query
+  );
+
   if (found) {
+    // Check stored password if available
+    try {
+      const passwords = JSON.parse(localStorage.getItem('vibe_demo_passwords') || '{}');
+      const storedPass = passwords[found.id];
+      if (storedPass && storedPass !== password) {
+        return { user: null as any, error: 'Contraseña incorrecta para este usuario.' };
+      }
+    } catch (e) {
+      // fallback
+    }
+
     setActiveUser(found.id);
     return { user: found };
   }
-  return { user: null as any, error: 'Usuario o contraseña incorrectos en el sistema demo.' };
+
+  return { user: null as any, error: 'No existe ninguna cuenta registrada con este correo o usuario.' };
+}
+
+export async function apiSignOut(): Promise<void> {
+  if (supabase) {
+    try {
+      await supabase.auth.signOut();
+    } catch (err) {
+      console.warn('Supabase signout failed:', err);
+    }
+  }
+
+  setActiveUser(null);
 }
 
 export async function apiGetPosts(): Promise<Post[]> {
@@ -307,6 +344,7 @@ export async function apiGetPosts(): Promise<Post[]> {
 
 export async function apiCreatePost(content: string): Promise<Post> {
   const activeUser = getActiveUser();
+  if (!activeUser) throw new Error('Debes iniciar sesión para publicar.');
   const trimmed = content.trim().slice(0, 280);
   const id_xion = generateIDXion();
 
@@ -447,6 +485,7 @@ export async function apiCreateComment(
   parentId?: string | null
 ): Promise<PostComment> {
   const activeUser = getActiveUser();
+  if (!activeUser) throw new Error('Debes iniciar sesión para comentar.');
   const trimmed = content.trim();
   const id_xion = generateIDXion();
 
@@ -566,6 +605,7 @@ export async function apiGetUsers(): Promise<UserProfile[]> {
 
 export async function apiUpdateProfile(updates: Partial<UserProfile>): Promise<UserProfile> {
   const active = getActiveUser();
+  if (!active) throw new Error('Debes iniciar sesión.');
   const users = getLocalUsers();
   const index = users.findIndex(u => u.id === active.id);
 
@@ -593,6 +633,7 @@ export async function apiUpdateProfile(updates: Partial<UserProfile>): Promise<U
 
 export async function apiGetMessages(otherUserId: string): Promise<ChatMessage[]> {
   const active = getActiveUser();
+  if (!active) return [];
 
   if (supabase) {
     try {
@@ -619,6 +660,7 @@ export async function apiGetMessages(otherUserId: string): Promise<ChatMessage[]
 
 export async function apiSendMessage(recipientId: string, content: string): Promise<ChatMessage> {
   const active = getActiveUser();
+  if (!active) throw new Error('Debes iniciar sesión para enviar un mensaje.');
   const trimmed = content.trim();
   const id_xion = generateIDXion();
   const convId = [active.id, recipientId].sort().join('_');
