@@ -22,6 +22,7 @@ import {
   apiGetUsers, 
   apiSignOut
 } from '../../lib/supabase';
+import { useToast } from '../ToastContext';
 
 interface ProfileIslandProps {
   onOpenAuth: () => void;
@@ -37,6 +38,7 @@ export const ProfileIsland: React.FC<ProfileIslandProps> = ({ onOpenAuth, onOpen
   const [myPosts, setMyPosts] = useState<Post[]>([]);
   const [saving, setSaving] = useState<boolean>(false);
   const [copiedXion, setCopiedXion] = useState<boolean>(false);
+  const toast = useToast();
 
   useEffect(() => {
     const handleAuthChange = () => {
@@ -44,8 +46,8 @@ export const ProfileIsland: React.FC<ProfileIslandProps> = ({ onOpenAuth, onOpen
       if (active) {
         setUser(active);
         setDisplayName(active.display_name);
-        setBio(active.bio);
-        setAvatarUrl(active.avatar_url);
+        setBio(active.bio || '');
+        setAvatarUrl(active.avatar_url || '');
         fetchUserPosts(active.id);
       } else {
         setUser(null);
@@ -84,8 +86,10 @@ export const ProfileIsland: React.FC<ProfileIslandProps> = ({ onOpenAuth, onOpen
       });
       setUser(updated);
       setIsEditing(false);
-    } catch (err) {
+      toast.success('¡Perfil actualizado con éxito!');
+    } catch (err: any) {
       console.error('Error updating profile:', err);
+      toast.error(err.message || 'Error al actualizar el perfil.');
     } finally {
       setSaving(false);
     }

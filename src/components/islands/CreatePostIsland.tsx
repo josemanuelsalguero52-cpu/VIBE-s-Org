@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Send, Sparkles, Hash, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { apiCreatePost, getActiveUser } from '../../lib/supabase';
+import { useToast } from '../ToastContext';
 
 interface CreatePostIslandProps {
   onPostPublished: () => void;
@@ -11,6 +12,7 @@ export const CreatePostIsland: React.FC<CreatePostIslandProps> = ({ onPostPublis
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [successMsg, setSuccessMsg] = useState<boolean>(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const toast = useToast();
 
   const activeUser = getActiveUser();
 
@@ -42,6 +44,7 @@ export const CreatePostIsland: React.FC<CreatePostIslandProps> = ({ onPostPublis
       await apiCreatePost(content);
       setContent('');
       setSuccessMsg(true);
+      toast.success('¡Publicación creada con éxito en VIBE!');
       
       // Dispatch custom event to notify feed island
       window.dispatchEvent(new CustomEvent('vibe_post_created'));
@@ -52,11 +55,14 @@ export const CreatePostIsland: React.FC<CreatePostIslandProps> = ({ onPostPublis
       }, 800);
     } catch (err: any) {
       console.error('Failed to create post:', err);
-      setErrorMsg(err.message || 'Error al publicar.');
+      const msg = err.message || 'Error al publicar.';
+      setErrorMsg(msg);
+      toast.error(msg);
     } finally {
       setIsSubmitting(false);
     }
   };
+
 
   return (
     <div className="flex flex-col h-full space-y-4">

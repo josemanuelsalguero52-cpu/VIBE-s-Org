@@ -4,8 +4,13 @@
  */
 
 import { IslandsCanvas } from './components/IslandsCanvas';
+import { ToastProvider } from './components/ToastContext';
 
 export default function App() {
-  return <IslandsCanvas />;
+  return (
+    <ToastProvider>
+      <IslandsCanvas />
+    </ToastProvider>
+  );
 }
 

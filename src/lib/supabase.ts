@@ -142,23 +142,61 @@ function saveLocalMessages(messages: ChatMessage[]) {
 }
 
 export function getActiveUser(): UserProfile | null {
+  const cachedProfile = localStorage.getItem('vibe_current_profile');
+  if (cachedProfile) {
+    try {
+      const parsed: UserProfile = JSON.parse(cachedProfile);
+      if (parsed && parsed.id) {
+        return parsed;
+      }
+    } catch {
+      // ignore
+    }
+  }
+
   const activeId = localStorage.getItem('vibe_active_user_id');
   if (!activeId) return null;
   const users = getLocalUsers();
-  return users.find(u => u.id === activeId) || null;
+  const found = users.find(u => u.id === activeId);
+  if (found) {
+    localStorage.setItem('vibe_current_profile', JSON.stringify(found));
+    return found;
+  }
+  return null;
 }
 
-export function setActiveUser(userId: string | null): UserProfile | null {
-  if (!userId) {
+export function setActiveUser(userOrId: UserProfile | string | null): UserProfile | null {
+  if (!userOrId) {
     localStorage.removeItem('vibe_active_user_id');
+    localStorage.removeItem('vibe_current_profile');
     window.dispatchEvent(new CustomEvent('vibe_auth_changed', { detail: null }));
     return null;
   }
-  localStorage.setItem('vibe_active_user_id', userId);
-  const users = getLocalUsers();
-  const found = users.find(u => u.id === userId) || null;
-  window.dispatchEvent(new CustomEvent('vibe_auth_changed', { detail: found }));
-  return found;
+
+  let userProfile: UserProfile | null = null;
+
+  if (typeof userOrId === 'object') {
+    userProfile = userOrId;
+  } else {
+    const users = getLocalUsers();
+    userProfile = users.find(u => u.id === userOrId) || null;
+  }
+
+  if (userProfile) {
+    localStorage.setItem('vibe_active_user_id', userProfile.id);
+    localStorage.setItem('vibe_current_profile', JSON.stringify(userProfile));
+
+    const users = getLocalUsers();
+    if (!users.some(u => u.id === userProfile!.id)) {
+      users.push(userProfile);
+      saveLocalUsers(users);
+    }
+
+    window.dispatchEvent(new CustomEvent('vibe_auth_changed', { detail: userProfile }));
+    return userProfile;
+  }
+
+  return null;
 }
 
 // Event emitter for real-time local sync
@@ -410,9 +448,11 @@ export async function apiCreatePost(content: string): Promise<Post> {
         };
         broadcastLocalEvent('new_post', newPost);
         return newPost;
+      } else if (error) {
+        console.warn('Supabase post insert error, falling back to local:', error.message);
       }
     } catch (err) {
-      console.warn('Supabase post failed, using local engine:', err);
+      console.warn('Supabase post exception, falling back to local:', err);
     }
   }
 
@@ -435,6 +475,7 @@ export async function apiCreatePost(content: string): Promise<Post> {
   broadcastLocalEvent('new_post', newPost);
   return newPost;
 }
+
 
 export async function apiToggleLikePost(postId: string): Promise<Post> {
   const posts = getLocalPosts();
