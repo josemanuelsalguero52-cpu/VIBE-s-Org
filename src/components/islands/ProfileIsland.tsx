@@ -9,7 +9,10 @@ import {
   Edit3,
   LogOut,
   UserPlus,
-  LogIn
+  LogIn,
+  Fingerprint,
+  Copy,
+  Key
 } from 'lucide-react';
 import { UserProfile, Post } from '../../types';
 import { 
@@ -33,6 +36,7 @@ export const ProfileIsland: React.FC<ProfileIslandProps> = ({ onOpenAuth, onOpen
   const [avatarUrl, setAvatarUrl] = useState<string>(user?.avatar_url || '');
   const [myPosts, setMyPosts] = useState<Post[]>([]);
   const [saving, setSaving] = useState<boolean>(false);
+  const [copiedXion, setCopiedXion] = useState<boolean>(false);
 
   useEffect(() => {
     const handleAuthChange = () => {
@@ -116,6 +120,60 @@ export const ProfileIsland: React.FC<ProfileIslandProps> = ({ onOpenAuth, onOpen
 
   return (
     <div className="flex flex-col h-full min-h-0 overflow-y-auto custom-scrollbar space-y-4 pr-1">
+      {/* Minimalist XION ID Traceable Card */}
+      <div className="bg-[#0A0E14] border border-white/10 rounded-xl p-4 shadow-md relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-32 h-32 bg-[#3B6FF0]/5 rounded-full blur-2xl pointer-events-none" />
+        
+        <div className="flex items-center justify-between pb-3 border-b border-white/10">
+          <div className="flex items-center space-x-2">
+            <div className="w-8 h-8 rounded-lg bg-[#3B6FF0]/10 flex items-center justify-center border border-[#3B6FF0]/20">
+              <Fingerprint className="w-4 h-4 text-[#3B6FF0]" />
+            </div>
+            <div>
+              <h4 className="font-semibold text-xs text-slate-100">ID XION Trazable</h4>
+              <p className="text-[10px] text-slate-400">Identificador criptográfico único en la red</p>
+            </div>
+          </div>
+          <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 text-[10px] font-medium border border-emerald-500/20">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            <span>Verificado</span>
+          </span>
+        </div>
+
+        <div className="pt-3 flex items-center justify-between gap-3">
+          <div className="flex-1 bg-[#121824] border border-white/10 rounded-lg px-3 py-2 flex items-center space-x-2">
+            <Key className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+            <span className="font-mono text-xs text-[#3B6FF0] font-bold tracking-wider select-all">
+              {user.id_xion || 'XD99-FT42'}
+            </span>
+          </div>
+          <button
+            onClick={() => {
+              navigator.clipboard.writeText(user.id_xion || 'XD99-FT42');
+              setCopiedXion(true);
+              setTimeout(() => setCopiedXion(false), 2000);
+            }}
+            className="px-3 py-2 rounded-lg bg-[#3B6FF0]/10 hover:bg-[#3B6FF0]/20 text-[#3B6FF0] text-xs font-semibold border border-[#3B6FF0]/20 transition-all flex items-center space-x-1 shrink-0"
+          >
+            {copiedXion ? (
+              <>
+                <Check className="w-3.5 h-3.5 text-emerald-400" />
+                <span className="text-emerald-400">¡Copiado!</span>
+              </>
+            ) : (
+              <>
+                <Copy className="w-3.5 h-3.5" />
+                <span>Copiar ID</span>
+              </>
+            )}
+          </button>
+        </div>
+
+        <p className="text-[10px] text-slate-400 mt-2.5 leading-relaxed">
+          Este ID XION garantiza la trazabilidad y autoría de tus publicaciones, interacciones y mensajes de forma descentralizada y segura en la arquitectura de islas.
+        </p>
+      </div>
+
       {/* Profile Header Card */}
       <div className="bg-[#0A0E14] border border-white/10 rounded-xl p-4 shadow-md">
         <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4">

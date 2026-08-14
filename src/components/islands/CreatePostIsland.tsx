@@ -10,6 +10,7 @@ export const CreatePostIsland: React.FC<CreatePostIslandProps> = ({ onPostPublis
   const [content, setContent] = useState<string>('');
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [successMsg, setSuccessMsg] = useState<boolean>(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const activeUser = getActiveUser();
 
@@ -36,6 +37,7 @@ export const CreatePostIsland: React.FC<CreatePostIslandProps> = ({ onPostPublis
     if (!content.trim() || content.length > maxChars || isSubmitting) return;
 
     setIsSubmitting(true);
+    setErrorMsg(null);
     try {
       await apiCreatePost(content);
       setContent('');
@@ -48,8 +50,9 @@ export const CreatePostIsland: React.FC<CreatePostIslandProps> = ({ onPostPublis
         setSuccessMsg(false);
         onPostPublished();
       }, 800);
-    } catch (err) {
+    } catch (err: any) {
       console.error('Failed to create post:', err);
+      setErrorMsg(err.message || 'Error al publicar.');
     } finally {
       setIsSubmitting(false);
     }
@@ -57,6 +60,13 @@ export const CreatePostIsland: React.FC<CreatePostIslandProps> = ({ onPostPublis
 
   return (
     <div className="flex flex-col h-full space-y-4">
+      {/* Error Message */}
+      {errorMsg && (
+        <div className="p-2 text-xs text-rose-300 bg-rose-500/10 rounded-lg border border-rose-500/20 mb-2">
+          {errorMsg}
+        </div>
+      )}
+
       {/* User Header */}
       <div className="flex items-center space-x-3 pb-3 border-b border-white/10">
         <img
