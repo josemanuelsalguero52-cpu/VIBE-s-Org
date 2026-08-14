@@ -28,8 +28,31 @@ export let supabase: SupabaseClient | null = null;
 if (isSupabaseConfigured) {
   try {
     supabase = createClient(supabaseUrl, supabaseKey);
+
+    // Setup Supabase Realtime subscriptions
+    supabase
+      .channel('vibe-public-realtime')
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'messages' },
+        (payload) => {
+          const newMsg = payload.new as ChatMessage;
+          const convId = newMsg.conversation_id || [newMsg.sender_id, newMsg.recipient_id].sort().join('_');
+          broadcastLocalEvent(`chat_${convId}`, newMsg);
+          broadcastLocalEvent('global_chat_message', newMsg);
+        }
+      )
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'posts' },
+        (payload) => {
+          const newPost = payload.new as Post;
+          broadcastLocalEvent('new_post', newPost);
+        }
+      )
+      .subscribe();
   } catch (err) {
-    console.warn('Failed to initialize Supabase client:', err);
+    console.warn('Failed to initialize Supabase client or realtime:', err);
   }
 }
 
